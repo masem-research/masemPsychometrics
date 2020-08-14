@@ -42,3 +42,62 @@ lavaanMIExtract <- function(RelevantVariable, lavaanMIObject, sortByMI = TRUE) {
 }
 
 
+
+
+
+#' @title lavaan: Extract standardized directed paths
+#'
+#' @description Extract directed paths from the result of `lavaan::standardizedSolution()` function
+#'
+#' @param lavaanStandardizedSolutionDF lavaan.data.frame. Contains standardized coefficients from call of
+#' `lavaan::standardizedSolution()` function
+#'
+#' @return data.frame. DataFrame with standardized directed paths.
+#' @export
+#'
+#' @examples
+#' ## Official example provided in lavaan package
+#' ## The industrialization and Political Democracy Example
+#' ## Bollen (1989), page 332
+#' ## Specify model
+#' model <- '
+#'   # latent variable definitions
+#'      ind60 =~ x1 + x2 + x3
+#'      dem60 =~ y1 + a*y2 + b*y3 + c*y4
+#'      dem65 =~ y5 + a*y6 + b*y7 + c*y8
+#'
+#'   # regressions
+#'     dem60 ~ ind60
+#'     dem65 ~ ind60 + dem60
+#'
+#'   # residual correlations
+#'     y1 ~~ y5
+#'     y2 ~~ y4 + y6
+#'     y3 ~~ y7
+#'     y4 ~~ y8
+#'     y6 ~~ y8'
+#' ## fit model to data
+#' fit <- sem(model, data = PoliticalDemocracy)
+#' ## get standardized solutions
+#' fit_stdSolution <- standardizedSolution(fit)
+#' ## Get standardized directed paths
+#' lavaanExtractStandardizedDirectedPaths(lavaanStandardizedSolutionDF = fit_stdSolution)
+lavaanExtractStandardizedDirectedPaths <- function(lavaanStandardizedSolutionDF) {
+  if (!inherits(lavaanStandardizedSolutionDF, "lavaan.data.frame")) {
+    stop("Input object is not a lavaan.data.frame.
+         \nDid you request something else?
+         \nPlease try lavaan::standardizedSolution(fit)")
+  }
+  ## Extract relevant parameters
+  stdSolutionReducedDataFrame <- data.frame(lhs = lavaanStandardizedSolutionDF$lhs,
+                                            op = lavaanStandardizedSolutionDF$op,
+                                            rhs = lavaanStandardizedSolutionDF$rhs,
+                                            est.std = lavaanStandardizedSolutionDF$est.std)
+  # extract path coefficients
+  stdSolutionReducedDataFrame <- stdSolutionReducedDataFrame[stdSolutionReducedDataFrame$op == "~",]
+  # delete row.names
+  row.names(stdSolutionReducedDataFrame) <- NULL
+  # return
+  return(stdSolutionReducedDataFrame)
+}
+
