@@ -1,5 +1,8 @@
 #' Little MCAR
-#'
+#' 
+#' @details: Function is developed and explained here: https://stats-bayes.com/post/2020/08/14/r-function-for-little-s-test-for-data-missing-completely-at-random/
+#' Further details will be added in the future!
+#' 
 #' @param x data.frame or matrix. Input to run Little's hypothesis test to check for MCAR on.
 #'
 #' @return
